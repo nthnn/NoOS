@@ -1,0 +1,22 @@
+{
+	"name": "NoOS",
+	"author": "Nathanne Isip",
+	"version": "v0.0.1",
+	"description": "NoOS (No Operating System) is an attempt unikernel framework for developing programs in C++ without OS.",
+	"git": "https://github.com/nthnn/NoOS",
+	"scripts": {
+		"build": [
+			"mkdir -p dist",
+			"nasm -f elf32 bootloader.asm -o dist/bootloader.o",
+			"find src -name \"*.cpp\" | xargs -I {} sh -c 'g++ -Wall -Wextra -m32 -ffreestanding -nostartfiles -nostdlib -std=c++17 -Iinclude -c {} -o dist/$(basename {} .cpp).o'",
+			"ld -z noexecstack -m elf_i386 -T linker.ld -o dist/kernel.bin dist/*.o",
+			"rm dist/*.o"
+		],
+		"noos": [
+			"qemu-system-i386 -vga virtio -enable-kvm -kernel dist/kernel.bin"
+		],
+		"clean": [
+			"rm -rf dist"
+		]
+	}
+}
