@@ -9,11 +9,20 @@
 			"mkdir -p dist",
 			"nasm -f elf32 bootloader.asm -o dist/bootloader.o",
 			"find src -name \"*.cpp\" | xargs -I {} sh -c 'g++ -Wall -Wextra -m32 -ffreestanding -nostartfiles -nostdlib -std=c++17 -Iinclude -c {} -o dist/$(basename {} .cpp).o'",
+			"g++ -Wall -Wextra -m32 -ffreestanding -nostartfiles -nostdlib -std=c++17 -Iinclude -c -o dist/{{1}}.o examples/{{1}}/{{1}}.cpp",
 			"ld -z noexecstack -m elf_i386 -T linker.ld -o dist/kernel.bin dist/*.o",
-			"rm dist/*.o"
+			"rm dist/*.o",
+			"mkdir dist/{{1}} dist/{{1}}/boot dist/{{1}}/boot/grub",
+			"cp menu.lst dist/{{1}}/boot/grub/",
+			"cp stage2_eltorito dist/{{1}}/boot/grub/",
+			"cp dist/kernel.bin dist/{{1}}/boot/",
+			"rm dist/kernel.bin",
+			"cd dist",
+			"mkisofs -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table -o {{1}}.iso {{1}}",
+			"rm -rf {{1}}"
 		],
-		"noos": [
-			"qemu-system-i386 -vga virtio -enable-kvm -kernel dist/kernel.bin"
+		"cd": [
+			"qemu-system-i386 -vga virtio -enable-kvm -cdrom dist/{{1}}.iso"
 		],
 		"clean": [
 			"rm -rf dist"
