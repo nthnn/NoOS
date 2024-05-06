@@ -1,10 +1,8 @@
+#include <noos_addr.h>
 #include <noos_io.h>
 #include <noos_term.h>
 
-#define KBD_STATUS_REGISTER 0x64
-#define KBD_DATA_REGISTER   0x60
-
-volatile rune* vga_buffer = (volatile rune*) 0xB8000;
+volatile rune* vga_buffer = (volatile rune*) NOOS_VIDEO_ADDRESS;
 static u16 x = 0, y = 26;
 
 static rune scanCodes[] = {
@@ -58,13 +56,13 @@ void NoOS::Term::init() {
 void NoOS::Term::scrollUp(u8 num) {
     u8* tmp;
     for(
-        vga_buffer = (volatile rune*) 0xB8000;
-        vga_buffer < (volatile rune*) (0xB8000 + 4000);
+        vga_buffer = (volatile rune*) NOOS_VIDEO_ADDRESS;
+        vga_buffer < (volatile rune*) (NOOS_VIDEO_ADDRESS + 4000);
         vga_buffer += 2
     ) {
         tmp = (u8*)(vga_buffer + num * 160);
 
-        if(tmp < (u8*) (0xB8000 + 4000)) {
+        if(tmp < (u8*) (NOOS_VIDEO_ADDRESS + 4000)) {
             *vga_buffer = *tmp;
             *(vga_buffer + 1) = *(tmp + 1);
         }
@@ -79,7 +77,9 @@ void NoOS::Term::scrollUp(u8 num) {
 }
 
 void NoOS::Term::print(rune ch) {
-    vga_buffer = (volatile rune*) (0xB8000 + 2 * x + 160 * y);
+    vga_buffer = (volatile rune*)
+        (NOOS_VIDEO_ADDRESS + 2 * x + 160 * y);
+
     switch(ch) {
         case 10:
             x = 0;
@@ -138,7 +138,7 @@ void NoOS::Term::println(string str) {
 }
 
 bool NoOS::Term::isKeyboardBufferEmpty() {
-    return (NoOS::IO::in8(KBD_STATUS_REGISTER) & 0x01) == 0;
+    return (NoOS::IO::in8(NOOS_KBD_STATUS_REGISTER) & 0x01) == 0;
 }
 
 rune NoOS::Term::readRune() {
@@ -147,17 +147,17 @@ rune NoOS::Term::readRune() {
 
     read:
     while(NoOS::Term::isKeyboardBufferEmpty());
-    ch = NoOS::IO::in8(KBD_DATA_REGISTER);
+    ch = NoOS::IO::in8(NOOS_KBD_DATA_REGISTER);
 
     if(ch == 0x2A || ch == 0x36) {
         while(NoOS::Term::isKeyboardBufferEmpty());
-        ch = NoOS::IO::in8(KBD_DATA_REGISTER);
+        ch = NoOS::IO::in8(NOOS_KBD_DATA_REGISTER);
 
         isShifted = true;
     }
 
     while(!NoOS::Term::isKeyboardBufferEmpty())
-        (void) NoOS::IO::in8(KBD_DATA_REGISTER);
+        (void) NoOS::IO::in8(NOOS_KBD_DATA_REGISTER);
 
     if((u32) ch < sizeof(scanCodes))
         ch = scanCodes[(u32) ch] & 0xff;
