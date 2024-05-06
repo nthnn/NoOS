@@ -18,7 +18,7 @@
 			"cp dist/kernel.bin dist/{{1}}/boot/",
 			"rm dist/kernel.bin",
 			"cd dist",
-			"mkisofs -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table -o {{1}}.iso {{1}}",
+			"mkisofs -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table -input-charset utf-8 -o {{1}}.iso {{1}}",
 			"rm -rf {{1}}"
 		],
 		"cd": [
