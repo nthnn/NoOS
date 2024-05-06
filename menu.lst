@@ -1,0 +1,7 @@
+timeout 30
+color black/cyan yellow/cyan
+default 0
+
+title Example Kernel
+   root (cd)
+   kernel /boot/kernel.bin
