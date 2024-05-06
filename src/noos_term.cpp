@@ -143,10 +143,18 @@ bool NoOS::Term::isKeyboardBufferEmpty() {
 
 rune NoOS::Term::readRune() {
     rune ch = 0;
+    bool isShifted = false;
 
     read:
     while(NoOS::Term::isKeyboardBufferEmpty());
     ch = NoOS::IO::in8(KBD_DATA_REGISTER);
+
+    if(ch == 0x2A || ch == 0x36) {
+        while(NoOS::Term::isKeyboardBufferEmpty());
+        ch = NoOS::IO::in8(KBD_DATA_REGISTER);
+
+        isShifted = true;
+    }
 
     while(!NoOS::Term::isKeyboardBufferEmpty())
         (void) NoOS::IO::in8(KBD_DATA_REGISTER);
@@ -155,6 +163,8 @@ rune NoOS::Term::readRune() {
         ch = scanCodes[(u32) ch] & 0xff;
     else goto read;
 
+    if(isShifted && ch >= 'a' && ch <= 'z')
+        ch = ch - ('a' - 'A');
     return ch;
 }
 
@@ -188,7 +198,7 @@ void NoOS::Term::readLine(string buf, u16 len) {
                 return;
 
             default:
-                if(idx < len - 1) {
+                if(idx < len - 1 && key >= 32) {
                     buf[idx++] = key;
                     size++;
 
