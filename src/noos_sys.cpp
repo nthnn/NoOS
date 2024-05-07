@@ -15,6 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <noos_addr.h>
 #include <noos_io.h>
 #include <noos_sys.h>
 #include <noos_types.h>
@@ -30,6 +31,10 @@ void NoOS::Sys::reboot() {
         sig = NoOS::IO::in8(0x64);
 
     NoOS::IO::out8(0x64, 0xFE);
+}
+
+void NoOS::Sys::shutdown() {
+    NoOS::IO::out16(NOOS_ACPI_CTRL_PORT, 0x2000 | 0x0808);
 }
 
 void NoOS::Sys::delay(u16 milliseconds) {
