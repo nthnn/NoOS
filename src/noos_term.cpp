@@ -17,48 +17,11 @@
 
 #include <noos_addr.h>
 #include <noos_io.h>
+#include <noos_scan_codes.h>
 #include <noos_term.h>
 
 volatile rune* vga_buffer = (volatile rune*) NOOS_VIDEO_ADDRESS;
 static u16 x = 0, y = 26;
-
-static rune scanCodes[] = {
-    0,  // Null
-    0,  // Escape
-
-    '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b', '\t',
-    'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n',
-    0, // Control
-    
-    'a', 's','d', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`',
-    0,  // Left Shift
-
-    '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/',
-    0,  // Right Shift
-
-    '*', 0,  // Alt
-    ' ', 0,  // Caps Lock
-
-    // F1- F10
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0,  // Num Lock
-    0,  // Scroll Lock
-
-    // Keypad 7 - 9
-    0, 0, 0,
-    '-',// Keypad -
-
-    // Keypad 4 - 6
-    0, 0, 0,
-    '+',// Keypad +
-
-    // Keypad 1 - 0
-    0, 0, 0, 0,
-    '.',// Keypad .
-
-    0, 0,  // Unused
-    0, 0,  // F11 - F12
-};
 
 void NoOS::Term::init() {
     for(u16 i = 0; i < 4000; i++)
@@ -176,12 +139,11 @@ rune NoOS::Term::readRune() {
     while(!NoOS::Term::isKeyboardBufferEmpty())
         (void) NoOS::IO::in8(NOOS_KBD_DATA_REGISTER);
 
-    if((u32) ch < sizeof(scanCodes))
-        ch = scanCodes[(u32) ch] & 0xff;
+    if((u32) ch < sizeof(LOWER_CASE_SCAN_CODES))
+        ch = (isShifted ? UPPER_CASE_SCAN_CODES :
+            LOWER_CASE_SCAN_CODES)[(u32) ch] & 0xff;
     else goto read;
 
-    if(isShifted && ch >= 'a' && ch <= 'z')
-        ch = ch - ('a' - 'A');
     return ch;
 }
 
