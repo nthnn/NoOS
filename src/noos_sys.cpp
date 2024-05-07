@@ -38,7 +38,7 @@ void NoOS::Sys::shutdown() {
 }
 
 void NoOS::Sys::delay(u16 milliseconds) {
-    u32 iterations = milliseconds * 100000;
+    u32 iterations = milliseconds * 2000000;
     for(u32 i = 0; i < iterations; i++)
         __asm__("nop");
 }
