@@ -26,5 +26,13 @@ extern  main
 
 start:
         cli
+
+        xor eax, eax
+        xor ebx, ebx
+        xor ecx, ecx
+        xor edx, edx
+        xor esi, esi
+        xor edi, edi
+
         call main
         hlt
