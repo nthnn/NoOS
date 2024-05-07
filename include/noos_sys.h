@@ -25,9 +25,10 @@ namespace NoOS {
 class Sys final {
 public:
     static void halt();
-    static void reboot();
-
     static void delay(u16 milliseconds);
+
+    static void reboot();
+    static void shutdown();
 };
 
 }
