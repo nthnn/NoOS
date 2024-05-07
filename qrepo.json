@@ -23,7 +23,9 @@
 			"rm -rf {{1}}"
 		],
 		"cd": [
-			"qemu-system-i386 -vga virtio -enable-kvm -cdrom dist/{{1}}.iso"
+			"rm -f dist/{{1}}.qcow2",
+			"qemu-img create -f qcow2 dist/{{1}}.qcow2 512M",
+			"qemu-system-i386 -vga virtio -enable-kvm -cpu host -usb -cdrom dist/{{1}}.iso -drive file=dist/{{1}}.qcow2,if=virtio"
 		],
 		"clean": [
 			"rm -rf dist"
