@@ -20,6 +20,8 @@
 
 #define NOOS_VIDEO_ADDRESS          0xB8000
 
+#define NOOS_ACPI_CTRL_PORT         0x0604
+
 #define NOOS_KBD_STATUS_REGISTER    0x64
 #define NOOS_KBD_DATA_REGISTER      0x60
 
